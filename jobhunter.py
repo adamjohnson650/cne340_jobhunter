@@ -93,6 +93,7 @@ def add_or_delete_job(jobpage, cursor):
             delete_job(cursor, jobdetails)
         else:
             add_new_job(cursor, jobdetails)
+            print("New job added:", jobdetails['title'])
             # INSERT JOB
             # Add in your code here to notify the user of a new posting. This code will notify the new user
 
