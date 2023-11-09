@@ -6,7 +6,7 @@ import time
 import html2text
 import mysql.connector
 import requests
-from datetime import date
+from time import date
 
 # Connect to database
 # You may need to edit the connect function based on your local settings.#I made a password for my database because it is important to do so. Also make sure MySQL server is running or it will not connect
