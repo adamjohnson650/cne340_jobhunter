@@ -1,6 +1,6 @@
 #Adam Johnson
 #CNE 340 Fall 2023
-#Finalproject
+#Finalproject Teddy helped me with datetime varchar
 import json
 import time
 import html2text
