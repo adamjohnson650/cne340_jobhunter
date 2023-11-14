@@ -6,7 +6,7 @@ import time
 import html2text
 import mysql.connector
 import requests
-from time import date
+from datetime import datetime
 
 # Connect to database
 # You may need to edit the connect function based on your local settings.#I made a password for my database because it is important to do so. Also make sure MySQL server is running or it will not connect
@@ -23,12 +23,12 @@ def create_tables(cursor):
     # Python is in latin-1 and error (Incorrect string value: '\xE2\x80\xAFAbi...') will occur if Description is not in unicode format due to the json data
     cursor.execute('''CREATE TABLE IF NOT EXISTS jobs (
         id INT PRIMARY KEY auto_increment, 
-        Job_id varchar(50) , 
-        company varchar (300), 
-        Created_at date, 
-        url mediumtext(30000), 
-        Title LONGBLOB, 
-        Description LONGBLOB 
+        Job_id VARCHAR(50) , 
+        company VARCHAR (300), 
+        Created_at DATE, 
+        url TEXT, 
+        Title VARCHAR(255), 
+        Description TEXT 
         ); ''')
 
 
@@ -43,9 +43,10 @@ def query_sql(cursor, query):
 def add_new_job(cursor, jobdetails):
     # extract all required columns
     description = html2text.html2text(jobdetails['description'])
-    date = jobdetails['publication_date'][0:10]
-    query = cursor.execute("INSERT INTO jobs( Description, Created_at " ") "
-                           "VALUES(%s,%s)", (description, date))
+    date = datetime.now().date()
+    query = cursor.execute("INSERT INTO jobs(Title, Description, Created_at) VALUES (%s, %s, %s)",
+                           (jobdetails['title'], description, date))
+
     # %s is what is needed for Mysqlconnector as SQLite3 uses ? the Mysqlconnector uses %s
     return query_sql(cursor, query)
 
@@ -53,14 +54,22 @@ def add_new_job(cursor, jobdetails):
 # Check if new job
 def check_if_job_exists(cursor, jobdetails):
     ##Add your code here
-    query = "SELECT * FROM jobs WHERE Job_id = %s"
-    return query_sql(cursor, query)
+    job_id = jobdetails.get('id', None)
+
+    if job_id is not None:
+        query = "SELECT * FROM jobs WHERE Job_id = %s"
+        cursor.execute(query, (job_id,))
+        return cursor.fetchall()
+    else:
+        print("Error: Job ID is missing.")
+        return []
 
 
 # Deletes job
 def delete_job(cursor, jobdetails):
     ##Add your code here
-    query = "DELETE FROM jobs WHERE Created_at < DATE_SUB(CURDATE(), INTERVAL 14 DAY)"
+    query = "DELETE FROM jobs WHERE Created_at < DATE_SUB(CURDATE(), INTERVAL %s DAY)"
+    cursor.execute(query, (14,))
     return query_sql(cursor, query)
 
 
